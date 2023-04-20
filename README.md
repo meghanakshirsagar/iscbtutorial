@@ -37,4 +37,4 @@ A basic understanding of R syntax would be helpful, but not required.
 
 You can access the tutorial from [github](https://meghanakshirsagar.github.io/icsbtutorial/) 
 
-Slides are [online](https://docs.google.com/presentation/d/1VUcKvvb_nZAXyVBwGpQ_gndO5uLoz2UqtWHVtwbMWxg/edit#slide=id.p3)
+Slides are [online](https://docs.google.com/presentation/d/1Q97YKnuTdUQPzQR5cqriJKlrm-7HyiDF-YOVFgC7y3s/edit?usp=sharing)
