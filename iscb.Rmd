@@ -142,7 +142,7 @@ dittoDimPlot(merged_seurat_filtered, "Patient", do.label = TRUE) + ggtitle(" ")
 
 ## Approach 2: Batch correction using MNN
 
-```{r, results='hide', warning=FALSE, warning=FALSE}
+```{r, results='hide', warning=FALSE, echo=FALSE}
 merged_mnn <- merged_unprocessed
 merged_mnn <- NormalizeData(object = merged_mnn, normalization.method = "LogNormalize", scale.factor = 10000)
 merged_mnn <- FindVariableFeatures(object = merged_mnn, mean.function = ExpMean, dispersion.function = LogVMR,x.low.cutoff = 0.05, x.high.cutoff = 5, y.cutoff = 0.5, do.plot = T)
@@ -212,7 +212,8 @@ ggarrange(UMAP_singleR)
 
 ```
 #### Method 2:  Annotation with scMRMA
-The final annotation tool that we will discuss in our tutorial is  scMRMA, ‘single cell Multiresolution Marker-based Annotation’ algorithm, which is a bidirectional method that maps cell clusters against a hierarchical reference by [Li et. al](https://academic.oup.com/nar/article/50/2/e7/6396893#327582259). scMRMA uses a reference database, PanglaoDB, with lists of cell-type markers for various tissue types for both human and mouse, which makes it possible to explore cell types with a list of marker genes. Furthermore, it also uses another database, TcellAI containing 22 subcelltypes of T-cells. TcellAI is a part of ImmuCellAI, which was originally collected for cancer immune cells [Miao et. al](https://doi.org/10.1002%2Fadvs.201902880). Therefore, TcellAI is very useful for annotating specific T-cell populations in cancer. In addition, scMRMA accepts user-defined references as well making it a popular choice to be investigated for automated celltype annotation.     
+
+Another annotation tool that we will discuss in our tutorial is  scMRMA, ‘single cell Multiresolution Marker-based Annotation’ algorithm, which is a bidirectional method that maps cell clusters against a hierarchical reference by [Li et. al](https://academic.oup.com/nar/article/50/2/e7/6396893#327582259). scMRMA uses a reference database, PanglaoDB, with lists of cell-type markers for various tissue types for both human and mouse, which makes it possible to explore cell types with a list of marker genes. Furthermore, it also uses another database, TcellAI containing 22 subcelltypes of T-cells. TcellAI is a part of ImmuCellAI, which was originally collected for cancer immune cells [Miao et. al](https://doi.org/10.1002%2Fadvs.201902880). Therefore, TcellAI is very useful for annotating specific T-cell populations in cancer. In addition, scMRMA accepts user-defined references as well making it a popular choice to be investigated for automated celltype annotation.     
 
 
 ```{r results='hide', warning=FALSE}
@@ -255,6 +256,7 @@ ggarrange(UMAP_scMRMA_tcellAI)
 ```
 
 #### Method 3:  Annotation with SCSA
+
 SCSA is a python based annotation tool, which annotates the cell types from scRNA-seq data, based on a score annotation model combining differentially expressed genes (DEGs) and confidence levels of cell markers from both known and user-defined information by [Cao et. al](https://www.frontiersin.org/articles/10.3389/fgene.2020.00490/full). SCSA annotation can be directly applied to clustering results obtained from Seurat as well as CellRanger, making it an ideal choice for investigation in this study.
 
 Hence, we will create a .csv file with FindAllMarkers() function and give it as an input to SCSA for annotation containing the cluster results.

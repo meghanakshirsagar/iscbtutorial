@@ -1,9 +1,9 @@
-name: "my-website"
+name: "allele"
+theme: "cayman"
 navbar:
-  title: "Immune cell profiling from single cell RNA with R"
+  title: "Allele"
   left:
     - text: "Home"
-      href: iscbtutorial23.html
-    - text: "About"
-      href: about.html
-output_dir: docs
+      href: index.html
+    - text: "Vignette"
+      href: iscb.html
