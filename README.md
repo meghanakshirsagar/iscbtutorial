@@ -1,6 +1,4 @@
-# iscbtutorial
-
-### ISCBTutorial23: Immune cell profiling from single-cell RNA with R
+### ISCBTutorial 2023: Immune cell profiling from single-cell RNA with R
 
 ### Team
 
