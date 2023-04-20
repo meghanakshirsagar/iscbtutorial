@@ -405,23 +405,23 @@ merged_seurat_filtered &lt;- ScaleData(merged_seurat_filtered)</code></pre>
 <pre><code>## Centering and scaling data matrix</code></pre>
 <pre class="r"><code>merged_seurat_filtered &lt;- RunPCA(merged_seurat_filtered, verbose = FALSE)
 merged_seurat_filtered &lt;- RunUMAP(merged_seurat_filtered, dims = 1:20, reduction.name =&quot;UMAP_BatchEffect_Uncorrected&quot;)</code></pre>
-<pre><code>## 18:31:21 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
-<pre><code>## 18:31:21 Read 32307 rows and found 20 numeric columns</code></pre>
-<pre><code>## 18:31:21 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
-<pre><code>## 18:31:21 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
+<pre><code>## 18:54:43 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
+<pre><code>## 18:54:43 Read 32307 rows and found 20 numeric columns</code></pre>
+<pre><code>## 18:54:43 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
+<pre><code>## 18:54:43 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
 <pre><code>## 0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
 <pre><code>## [----|----|----|----|----|----|----|----|----|----|</code></pre>
 <pre><code>## **************************************************|
-## 18:31:23 Writing NN index file to temp file /var/folders/mz/1vyj5rj15szdy7q3090wg_q40000gn/T//Rtmp7nJM25/file13a8219658e7f
-## 18:31:23 Searching Annoy index using 1 thread, search_k = 3000
-## 18:31:30 Annoy recall = 100%
-## 18:31:30 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
-## 18:31:31 Initializing from normalized Laplacian + noise (using irlba)
-## 18:31:34 Commencing optimization for 200 epochs, with 1409320 positive edges
-## 18:31:48 Optimization finished</code></pre>
+## 18:54:45 Writing NN index file to temp file /var/folders/mz/1vyj5rj15szdy7q3090wg_q40000gn/T//Rtmp7nJM25/file13a824754686
+## 18:54:45 Searching Annoy index using 1 thread, search_k = 3000
+## 18:54:53 Annoy recall = 100%
+## 18:54:54 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+## 18:54:55 Initializing from normalized Laplacian + noise (using irlba)
+## 18:54:58 Commencing optimization for 200 epochs, with 1409320 positive edges
+## 18:55:12 Optimization finished</code></pre>
 <p>UMAP with batch effects</p>
 <pre class="r"><code>dittoDimPlot(merged_seurat_filtered, var=&quot;Patient&quot;, reduction.use = &quot;UMAP_BatchEffect_Uncorrected&quot;, do.label = TRUE) + ggtitle(&quot;Batch effects&quot;)</code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="iscb_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 </div>
 <div id="approach-1-batch-correction-using-harmony"
 class="section level2">
@@ -439,22 +439,22 @@ merged_seurat_filtered &lt;- RunHarmony(merged_seurat_filtered, group.by.vars = 
 <pre><code>## Harmony 3/10</code></pre>
 <pre><code>## Harmony converged after 3 iterations</code></pre>
 <pre class="r"><code>merged_seurat_filtered &lt;- RunUMAP(merged_seurat_filtered, reduction = &quot;harmony&quot;, dims = 1:20)</code></pre>
-<pre><code>## 18:33:07 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
-<pre><code>## 18:33:07 Read 32307 rows and found 20 numeric columns</code></pre>
-<pre><code>## 18:33:07 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
-<pre><code>## 18:33:07 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
+<pre><code>## 18:56:33 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
+<pre><code>## 18:56:33 Read 32307 rows and found 20 numeric columns</code></pre>
+<pre><code>## 18:56:33 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
+<pre><code>## 18:56:33 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
 <pre><code>## 0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
 <pre><code>## [----|----|----|----|----|----|----|----|----|----|</code></pre>
 <pre><code>## **************************************************|
-## 18:33:08 Writing NN index file to temp file /var/folders/mz/1vyj5rj15szdy7q3090wg_q40000gn/T//Rtmp7nJM25/file13a8252ccba03
-## 18:33:09 Searching Annoy index using 1 thread, search_k = 3000
-## 18:33:16 Annoy recall = 100%
-## 18:33:17 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
-## 18:33:18 Initializing from normalized Laplacian + noise (using irlba)
-## 18:33:19 Commencing optimization for 200 epochs, with 1448710 positive edges
-## 18:33:34 Optimization finished</code></pre>
+## 18:56:35 Writing NN index file to temp file /var/folders/mz/1vyj5rj15szdy7q3090wg_q40000gn/T//Rtmp7nJM25/file13a823ff32a2a
+## 18:56:35 Searching Annoy index using 1 thread, search_k = 3000
+## 18:56:43 Annoy recall = 100%
+## 18:56:44 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+## 18:56:45 Initializing from normalized Laplacian + noise (using irlba)
+## 18:56:47 Commencing optimization for 200 epochs, with 1448710 positive edges
+## 18:57:02 Optimization finished</code></pre>
 <pre class="r"><code>dittoDimPlot(merged_seurat_filtered, &quot;Patient&quot;, do.label = TRUE) + ggtitle(&quot; &quot;)</code></pre>
-<p><img src="about_files/figure-html/processing-1.png" width="672" /></p>
+<p><img src="iscb_files/figure-html/processing-1.png" width="672" /></p>
 </div>
 <div id="approach-2-batch-correction-using-mnn" class="section level2">
 <h2>Approach 2: Batch correction using MNN</h2>
@@ -464,27 +464,27 @@ merged_mnn &lt;- FindVariableFeatures(object = merged_mnn, mean.function = ExpMe
 merged_seurat_filtered_mnn &lt;- RunFastMNN(object.list = SplitObject(merged_mnn, split.by = &quot;Patient&quot;))</code></pre>
 <pre><code>## Computing 2000 integration features</code></pre>
 <pre class="r"><code>merged_seurat_filtered_mnn &lt;- RunUMAP(merged_seurat_filtered_mnn, reduction = &quot;mnn&quot;, dims = 1:20,  reduction.name = &quot;UMAP_mnnCorrected&quot;)</code></pre>
-<pre><code>## 18:34:22 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
-<pre><code>## 18:34:22 Read 32307 rows and found 20 numeric columns</code></pre>
-<pre><code>## 18:34:22 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
-<pre><code>## 18:34:22 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
+<pre><code>## 18:57:54 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
+<pre><code>## 18:57:54 Read 32307 rows and found 20 numeric columns</code></pre>
+<pre><code>## 18:57:54 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
+<pre><code>## 18:57:54 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
 <pre><code>## 0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
 <pre><code>## [----|----|----|----|----|----|----|----|----|----|</code></pre>
 <pre><code>## **************************************************|
-## 18:34:24 Writing NN index file to temp file /var/folders/mz/1vyj5rj15szdy7q3090wg_q40000gn/T//Rtmp7nJM25/file13a82e45f67b
-## 18:34:24 Searching Annoy index using 1 thread, search_k = 3000
-## 18:34:32 Annoy recall = 100%
-## 18:34:32 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
-## 18:34:33 Initializing from normalized Laplacian + noise (using irlba)
-## 18:34:36 Commencing optimization for 200 epochs, with 1455768 positive edges
-## 18:34:51 Optimization finished</code></pre>
+## 18:57:56 Writing NN index file to temp file /var/folders/mz/1vyj5rj15szdy7q3090wg_q40000gn/T//Rtmp7nJM25/file13a8232fda2cc
+## 18:57:56 Searching Annoy index using 1 thread, search_k = 3000
+## 18:58:04 Annoy recall = 100%
+## 18:58:05 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+## 18:58:06 Initializing from normalized Laplacian + noise (using irlba)
+## 18:58:09 Commencing optimization for 200 epochs, with 1455768 positive edges
+## 18:58:24 Optimization finished</code></pre>
 <pre class="r"><code>merged_seurat_filtered_mnn &lt;- FindNeighbors(merged_seurat_filtered_mnn, reduction = &quot;mnn&quot;, dims = 1:20)</code></pre>
 <pre><code>## Computing nearest neighbor graph
 ## Computing SNN</code></pre>
 <pre class="r"><code>merged_seurat_filtered_mnn &lt;- FindClusters(merged_seurat_filtered_mnn)
 
 dittoDimPlot(merged_seurat_filtered_mnn, &quot;Patient&quot;, , reduction.use = &quot;UMAP_mnnCorrected&quot;, do.label = TRUE) + ggtitle(&quot;Batch correction using MNN&quot;)</code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="iscb_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <pre class="r"><code>p1 &lt;- dittoDimPlot(merged_seurat_filtered, var = &quot;Patient&quot;, 
                    reduction.use = &quot;UMAP_BatchEffect_Uncorrected&quot;, size = 0.2) + 
     ggtitle(&quot;Patient ID on UMAP before correction&quot;)
@@ -493,7 +493,7 @@ p2 &lt;- dittoDimPlot(merged_seurat_filtered_mnn, var = &quot;Patient&quot;,
     ggtitle(&quot;Patient ID on UMAP after correction&quot;)
 
 plot_grid(p1, p2)</code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="iscb_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 </div>
 <div id="cell-type-annotations" class="section level2">
 <h2>Cell Type Annotations</h2>
@@ -545,7 +545,7 @@ write.csv(all.cluster.markers, &quot;ISCBgastric_singleR_labels_mnn.csv&quot;)</
 <pre class="r"><code>UMAP_singleR &lt;- dittoDimPlot(seurat.singleR, reduction.use = &#39;UMAP_mnnCorrected&#39;, var = &#39;singleR.labels&#39;) + ggtitle(&quot;SingleR Annotations&quot;) + theme(legend.text = element_text(size = 10), aspect.ratio = 1)
 
 ggarrange(UMAP_singleR)</code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-7-1.png" width="672" />
+<p><img src="iscb_files/figure-html/unnamed-chunk-7-1.png" width="672" />
 #### Method 2: Annotation with scMRMA The final annotation tool that we
 will discuss in our tutorial is scMRMA, ‘single cell Multiresolution
 Marker-based Annotation’ algorithm, which is a bidirectional method that
@@ -576,7 +576,7 @@ result &lt;- scMRMA(input = merged_seurat_scMRMA,
 merged_seurat_scMRMA[[&quot;scMRMA&quot;]] &lt;- result$multiR$annotationResult[colnames(merged_seurat_scMRMA),ncol(result$multiR$annotationResult)]</code></pre>
 <pre class="r"><code>UMAP_scMRMA &lt;- dittoDimPlot(merged_seurat_scMRMA,reduction.use = &quot;UMAP_mnnCorrected&quot;,var = &quot;scMRMA&quot;)+ ggtitle(&quot;scMRMA Annotations&quot;) + theme(legend.text = element_text(size = 10), aspect.ratio = 1)
 ggarrange(UMAP_scMRMA)</code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p><img src="iscb_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 <pre class="r"><code>result &lt;- scMRMA(input = merged_seurat_scMRMA,
                  species = &quot;Hs&quot;,
                  db = &quot;TcellAI&quot;,
@@ -590,7 +590,7 @@ ggarrange(UMAP_scMRMA)</code></pre>
 merged_seurat_scMRMA[[&quot;scMRMA_TcellAI&quot;]] &lt;- result$multiR$annotationResult[colnames(merged_seurat_scMRMA),ncol(result$multiR$annotationResult)]</code></pre>
 <pre class="r"><code>UMAP_scMRMA_tcellAI &lt;- dittoDimPlot(merged_seurat_scMRMA,reduction.use = &quot;UMAP_mnnCorrected&quot;,var = &quot;scMRMA_TcellAI&quot;, do.label = TRUE)+ ggtitle(&quot;scMRMA Annotations with TcellAI&quot;) + theme(legend.text = element_text(size = 10), aspect.ratio = 1)
 ggarrange(UMAP_scMRMA_tcellAI)</code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="iscb_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 </div>
 <div id="method-3-annotation-with-scsa" class="section level4">
 <h4>Method 3: Annotation with SCSA</h4>
@@ -659,19 +659,19 @@ href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE134520#:~:text=1947.
 for T cell with Nebulosa for batch corrected seurat object.</p>
 <pre class="r"><code>tcell &lt;- plot_density(seurat.singleR, c(&quot;CD2&quot;), reduction = &quot;UMAP_mnnCorrected&quot;) + theme(text = element_text(size = 7))  
 tcell + plot_layout(ncol = 1) + theme(text = element_text(size = 7)) </code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p><img src="iscb_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 <pre class="r"><code>tcell &lt;- plot_density(seurat.singleR, c(&quot;CD3D&quot;), reduction = &quot;UMAP_mnnCorrected&quot;) + theme(text = element_text(size = 7))  
 tcell + plot_layout(ncol = 1) + theme(text = element_text(size = 7)) </code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><img src="iscb_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 <pre class="r"><code>tcell &lt;- plot_density(seurat.singleR, c(&quot;CD3E&quot;), reduction = &quot;UMAP_mnnCorrected&quot;) + theme(text = element_text(size = 7))  
 tcell + plot_layout(ncol = 1) + theme(text = element_text(size = 7)) </code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p><img src="iscb_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
 <pre class="r"><code>tcell &lt;- plot_density(seurat.singleR, c(&quot;CD3G&quot;), reduction = &quot;UMAP_mnnCorrected&quot;) + theme(text = element_text(size = 7))  
 tcell + plot_layout(ncol = 1) + theme(text = element_text(size = 7)) </code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p><img src="iscb_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
 <pre class="r"><code>tcell &lt;- plot_density(seurat.singleR, c(&quot;CD2&quot;, &quot;CD3D&quot;, &quot;CD3E&quot;, &quot;CD3G&quot;), joint=TRUE, combine=FALSE, reduction = &quot;UMAP_mnnCorrected&quot;)  
 tcell[[length(tcell)]]</code></pre>
-<p><img src="about_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p><img src="iscb_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
 </div>
 <div id="building-immune-profile" class="section level2">
 <h2>Building Immune Profile</h2>
