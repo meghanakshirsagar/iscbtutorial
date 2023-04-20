@@ -1,0 +1,9 @@
+name: "my-website"
+navbar:
+  title: "Immune cell profiling from single cell RNA with R"
+  left:
+    - text: "Home"
+      href: iscbtutorial23.html
+    - text: "About"
+      href: about.html
+output_dir: docs

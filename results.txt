@@ -1,0 +1,9 @@
+Version V1.1 [2020/07/03]
+DB load: 47347 3 3 48257 37440
+Namespace(input='/Users/orphic/Downloads/SCSA-master/gastric_scsa.csv', output=None, db='/Users/orphic/Downloads/SCSA-master/whole.db', source='seurat', cluster='all', MarkerDB=None, foldchange=1.5, pvalue=0.01, weight=100.0, species='Human', tissue='All', outfmt='ms-excel', celltype='normal', target='cellmarker', Gensymbol=True, norefdb=False, noprint=False, list_tissue=False)
+Version V1.1 [2020/07/03]
+DB load: 47347 3 3 48257 37440
+load markers: 45409
+############################## Cluster 0 ##############################
+
+avg_logFC column not in the input table!

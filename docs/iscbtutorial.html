@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Team: Meghana Kshirsagar, Gauri Vaidya and Yang Ye" />
+
+<meta name="date" content="2023-04-21" />
+
+<title>Immune cell profiling from single cell RNA with R</title>
+
+<script src="site_libs/header-attrs-2.21/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+  p.abstract{
+    text-align: center;
+    font-weight: bold;
+  }
+  div.abstract{
+    margin: auto;
+    width: 90%;
+  }
+</style>
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Immune cell profiling from single cell RNA with R</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="iscbtutorial23.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Immune cell profiling from single cell RNA
+with R</h1>
+<h4 class="author">Team: Meghana Kshirsagar, Gauri Vaidya and Yang
+Ye</h4>
+<h4 class="date">April 21, 2023</h4>
+<div class="abstract">
+<p class="abstract">Abstract</p>
+Over the past couple of decades, immunotherapy treatments have been
+widely adopted as an alternative treatment for a variety of cancers. The
+study of tumour microenvironment of immune cells such as macrophages, T
+cells and B cells amongst others can help to unravel the mystery of
+differential outcomes to immunotherapy treatments. Gene expression
+profiling can help to identify the patterns of genes expressed in major
+immune cells amongst cohorts of patients at different stages of cancer
+to generate new biological hypotheses. Statistical approaches can
+facilitate the identification of highly variable genes and their
+expression in immune cells by performing analysis of scRNA sequencing
+data. The tutorial will be divided in three parts; comparing the popular
+annotation tools, applying dimensionality reduction techniques to obtain
+multi-stage downstreaming of scRNA data and extracting crucial insights
+from immune cell populations and subpopulations. Throughout the tutorial
+we will follow the seurat pipeline version 4.0.
+</div>
+
+</div>
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>In this tutorial, we perform comparative analysis of different
+annotation tools for scRNA-seq data. The annotation tools are compared
+on the basis of their ability to correctly label the celltypes and the
+respective marker genes. We demonstrate the workflow using gastric
+cancer dataset throughout the tutorial. The source code is available at
+<a
+href="https://github.com/meghanakshirsagar/ISCBTutorial23">GitHub</a>.</p>
+<div id="objective" class="section level3">
+<h3>Objective</h3>
+<p>To design Allele (Annotation tooLs singLe cElL knowledgebasE), a
+knowledge graph driven by data mining and deep learning algorithms to
+reveal interesting and unique patterns in cohorts.</p>
+</div>
+<div id="load-libraries" class="section level3">
+<h3>Load libraries</h3>
+<p>Install the relevant R libraries</p>
+<pre class="r"><code>library(Seurat)
+library(tidyverse)
+library(ggplot2)
+library(scCustomize)
+library(gridExtra)
+library(DESeq2)
+library(celldex)
+library(ggpubr)
+library(SingleR)
+library(scMRMA)
+library(SeuratWrappers)
+library(Nebulosa)
+library(dittoSeq)
+library(harmony)
+library(cowplot)
+library(viridis)
+library(scuttle)
+library(trqwe)
+set.seed(1000)</code></pre>
+</div>
+<div id="load-dataset" class="section level3">
+<h3>Load Dataset</h3>
+<p>We will use throughout this vignette, publicly available single-cell
+RNA-seq dataset provided by <a
+href="https://doi.org/10.1016/j.celrep.2019.04.052">Zhang et al.</a>.
+The dataset is available in the Gene Expression Omnibus with Accession
+Number <a
+href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE134520">GSE134520</a>.</p>
+<p>In this study, 13 samples of patients diagnosed with gastritis,
+intestinal metaplasia or early gastric cancer are provided. All the
+samples are merged together into a Seurat object and it can be
+downloaded from <a
+href="https://ulcampus-my.sharepoint.com/:u:/g/personal/gauri_vaidya_ul_ie/EWQnJYr_mRVKn9v8c6H1ersBwAOs3Prl7tn6c4huUIgBYg?e=eCOAzF">here</a>.</p>
+<pre class="r"><code>merged_seurat &lt;- readRDS(&#39;gastric_dataset.rds&#39;)</code></pre>
+</div>
+</div>
+<div id="quality-control-and-filtering" class="section level2">
+<h2>Quality Control and Filtering</h2>
+<p>We will follow the recommendations for quality control and filtering
+parameters as mentioned by <a
+href="https://doi.org/10.1016/j.celrep.2019.04.052">Zhang et.
+al</a>.</p>
+<pre class="r"><code># get row names of the seurat object
+merged_seurat$sample &lt;- rownames(merged_seurat@meta.data)
+
+merged_seurat@meta.data &lt;- separate(merged_seurat@meta.data, col = &#39;sample&#39;, into = c(&#39;Patient&#39;, &#39;Barcode&#39;), sep = &#39;__&#39;)
+
+# specify patient and type of diagnosis
+Patient = c(&quot;patient1&quot;, &quot;patient2&quot;, &quot;patient3&quot;, 
+            &quot;patient4&quot;, &quot;patient5&quot;, &quot;patient6&quot;  , &quot;patient7&quot;,
+            &quot;patient8&quot;, &quot;patient9&quot;, &quot;patient10&quot;,
+            &quot;patient11&quot;, &quot;patient12&quot;, &quot;patient13&quot;)
+
+values &lt;- c(&quot;NAG&quot;, &quot;NAG&quot;, &quot;NAG&quot;, &quot;CAG&quot;, &quot;CAG&quot;, &quot;CAG&quot;, &quot;IMW&quot;, &quot;IMW&quot;, &quot;IMS&quot;, &quot;IMS&quot;, &quot;IMS&quot;, &quot;IMS&quot;, &quot;EGC&quot;)</code></pre>
+<pre class="r"><code># add column in seurat object to specify the type of the patient
+merged_seurat$type &lt;- values[match(merged_seurat$Patient, Patient)]
+
+# calculate the percentage of mitochondrial and ribosomal genes
+
+merged_seurat$mitoPercent &lt;- PercentageFeatureSet(merged_seurat, pattern=&quot;^MT-&quot;)
+merged_seurat$riboPercent &lt;- PercentageFeatureSet(merged_seurat, pattern=&quot;^RPL&quot;)</code></pre>
+<pre class="r"><code># filter the object
+merged_seurat_filtered &lt;- subset(merged_seurat, subset = nFeature_RNA &gt; 400 &amp; nFeature_RNA &lt; 7000 &amp; mitoPercent &lt; 20 &amp; riboPercent &lt; 20)
+merged_mnn &lt;- merged_seurat_filtered</code></pre>
+</div>
+<div
+id="data-processing-and-normalization-of-the-gene-expression-matrix-using-seurat-pipeline"
+class="section level2">
+<h2>Data processing and normalization of the gene expression matrix
+using Seurat pipeline</h2>
+<p>In this section, we pretty much follow <a
+href="https://satijalab.org/seurat/archive/v3.1/pbmc3k_tutorial.html">the
+vignette from Seurat</a> for the preprocessing of the scRNA We perform a
+standard scRNA-seq normalization and processing: 1. NormalizeData 2.
+FindVariableFeatures 3. ScaleData 4. RunPCA 5. RunUMAP</p>
+<p>We perform library size normalization by rescaling counts to a common
+library size of 10000.</p>
+<pre class="r"><code>merged_unprocessed &lt;- merged_seurat_filtered
+merged_seurat_filtered &lt;- NormalizeData(object = merged_seurat_filtered, normalization.method = &quot;LogNormalize&quot;, scale.factor = 10000)
+merged_seurat_filtered &lt;- FindVariableFeatures(object = merged_seurat_filtered, mean.function = ExpMean, dispersion.function = LogVMR,x.low.cutoff = 0.05, x.high.cutoff = 5, y.cutoff = 0.5, do.plot = T)</code></pre>
+<pre><code>## Warning: The following arguments are not used: x.low.cutoff, x.high.cutoff,
+## y.cutoff, do.plot</code></pre>
+<pre class="r"><code>merged_seurat_filtered &lt;- ScaleData(merged_seurat_filtered)</code></pre>
+<pre><code>## Centering and scaling data matrix</code></pre>
+<pre class="r"><code>merged_seurat_filtered &lt;- RunPCA(merged_seurat_filtered, verbose = FALSE)
+merged_seurat_filtered &lt;- RunUMAP(merged_seurat_filtered, dims = 1:20, reduction.name =&quot;UMAP_BatchEffect_Uncorrected&quot;)</code></pre>
+<pre><code>## Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
+## To use Python UMAP via reticulate, set umap.method to &#39;umap-learn&#39; and metric to &#39;correlation&#39;
+## This message will be shown once per session</code></pre>
+<pre><code>## 02:50:54 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
+<pre><code>## 02:50:54 Read 32307 rows and found 20 numeric columns</code></pre>
+<pre><code>## 02:50:54 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
+<pre><code>## 02:50:54 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
+<pre><code>## 0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
+<pre><code>## [----|----|----|----|----|----|----|----|----|----|</code></pre>
+<pre><code>## **************************************************|
+## 02:50:56 Writing NN index file to temp file /var/folders/mz/1vyj5rj15szdy7q3090wg_q40000gn/T//RtmpiEfdAD/file11a76575a3ff1
+## 02:50:56 Searching Annoy index using 1 thread, search_k = 3000
+## 02:51:04 Annoy recall = 100%
+## 02:51:04 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+## 02:51:05 Initializing from normalized Laplacian + noise (using irlba)
+## 02:51:08 Commencing optimization for 200 epochs, with 1409320 positive edges
+## 02:51:22 Optimization finished</code></pre>
+<p>UMAP with batch effects</p>
+<pre class="r"><code>dittoDimPlot(merged_seurat_filtered, var=&quot;Patient&quot;, reduction.use = &quot;UMAP_BatchEffect_Uncorrected&quot;, do.label = TRUE) + ggtitle(&quot;Batch effects&quot;)</code></pre>
+<p><img src="iscbtutorial_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
+<div id="batch-correction-using-harmony" class="section level2">
+<h2>Batch correction using Harmony</h2>
+<pre class="r"><code># Library-size normalization, log-transformation, and centering and scaling of gene expression values
+merged_harmony &lt;- merged_unprocessed
+merged_seurat_filtered &lt;- NormalizeData(object = merged_seurat_filtered, normalization.method = &quot;LogNormalize&quot;, scale.factor = 10000)
+merged_seurat_filtered &lt;- FindVariableFeatures(object = merged_seurat_filtered, mean.function = ExpMean, dispersion.function = LogVMR,x.low.cutoff = 0.05, x.high.cutoff = 5, y.cutoff = 0.5, do.plot = T)</code></pre>
+<pre><code>## Warning: The following arguments are not used: x.low.cutoff, x.high.cutoff,
+## y.cutoff, do.plot</code></pre>
+<pre class="r"><code>merged_seurat_filtered &lt;- ScaleData(merged_seurat_filtered)</code></pre>
+<pre><code>## Centering and scaling data matrix</code></pre>
+<pre class="r"><code>merged_seurat_filtered &lt;- RunPCA(merged_seurat_filtered, verbose = FALSE)
+merged_seurat_filtered &lt;- RunHarmony(merged_seurat_filtered, group.by.vars = &quot;Patient&quot;)</code></pre>
+<pre><code>## Warning: Quick-TRANSfer stage steps exceeded maximum (= 1615350)</code></pre>
+<pre><code>## Harmony 1/10</code></pre>
+<pre><code>## Harmony 2/10</code></pre>
+<pre><code>## Harmony 3/10</code></pre>
+<pre><code>## Harmony converged after 3 iterations</code></pre>
+<pre><code>## Warning: Invalid name supplied, making object name syntactically valid. New
+## object name is Seurat..ProjectDim.RNA.harmony; see ?make.names for more details
+## on syntax validity</code></pre>
+<pre class="r"><code>merged_seurat_filtered &lt;- RunUMAP(merged_seurat_filtered, reduction = &quot;harmony&quot;, dims = 1:20)</code></pre>
+<pre><code>## 02:52:34 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
+<pre><code>## 02:52:34 Read 32307 rows and found 20 numeric columns</code></pre>
+<pre><code>## 02:52:34 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
+<pre><code>## 02:52:34 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
+<pre><code>## 0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
+<pre><code>## [----|----|----|----|----|----|----|----|----|----|</code></pre>
+<pre><code>## **************************************************|
+## 02:52:36 Writing NN index file to temp file /var/folders/mz/1vyj5rj15szdy7q3090wg_q40000gn/T//RtmpiEfdAD/file11a765be283b
+## 02:52:36 Searching Annoy index using 1 thread, search_k = 3000
+## 02:52:43 Annoy recall = 100%
+## 02:52:44 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+## 02:52:45 Initializing from normalized Laplacian + noise (using irlba)
+## 02:52:46 Commencing optimization for 200 epochs, with 1448710 positive edges
+## 02:53:01 Optimization finished</code></pre>
+<pre><code>## Warning: Cannot add objects with duplicate keys (offending key: UMAP_), setting
+## key to &#39;umap_&#39;</code></pre>
+<pre class="r"><code>dittoDimPlot(merged_seurat_filtered, &quot;Patient&quot;, do.label = TRUE) + ggtitle(&quot; &quot;)</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<p><img src="iscbtutorial_files/figure-html/processing-1.png" width="672" /></p>
+</div>
+<div id="batch-correction-using-mnn" class="section level2">
+<h2>Batch correction using MNN</h2>
+<pre class="r"><code>merged_mnn &lt;- merged_unprocessed
+merged_mnn &lt;- NormalizeData(object = merged_mnn, normalization.method = &quot;LogNormalize&quot;, scale.factor = 10000)
+merged_mnn &lt;- FindVariableFeatures(object = merged_mnn, mean.function = ExpMean, dispersion.function = LogVMR,x.low.cutoff = 0.05, x.high.cutoff = 5, y.cutoff = 0.5, do.plot = T)</code></pre>
+<pre><code>## Warning: The following arguments are not used: x.low.cutoff, x.high.cutoff,
+## y.cutoff, do.plot</code></pre>
+<pre class="r"><code>merged_seurat_filtered_mnn &lt;- RunFastMNN(object.list = SplitObject(merged_mnn, split.by = &quot;Patient&quot;))</code></pre>
+<pre><code>## Computing 2000 integration features</code></pre>
+<pre><code>## Warning: Keys should be one or more alphanumeric characters followed by an
+## underscore, setting key from mnn.reconstructed_ to mnnreconstructed_</code></pre>
+<pre class="r"><code>merged_seurat_filtered_mnn &lt;- RunUMAP(merged_seurat_filtered_mnn, reduction = &quot;mnn&quot;, dims = 1:20,  reduction.name = &quot;UMAP_mnnCorrected&quot;)</code></pre>
+<pre><code>## 02:53:46 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
+<pre><code>## 02:53:46 Read 32307 rows and found 20 numeric columns</code></pre>
+<pre><code>## 02:53:46 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
+<pre><code>## 02:53:46 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
+<pre><code>## 0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
+<pre><code>## [----|----|----|----|----|----|----|----|----|----|</code></pre>
+<pre><code>## **************************************************|
+## 02:53:48 Writing NN index file to temp file /var/folders/mz/1vyj5rj15szdy7q3090wg_q40000gn/T//RtmpiEfdAD/file11a764f349f22
+## 02:53:48 Searching Annoy index using 1 thread, search_k = 3000
+## 02:53:55 Annoy recall = 100%
+## 02:53:55 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+## 02:53:56 Initializing from normalized Laplacian + noise (using irlba)
+## 02:53:59 Commencing optimization for 200 epochs, with 1455768 positive edges
+## 02:54:13 Optimization finished</code></pre>
+<pre class="r"><code>merged_seurat_filtered_mnn &lt;- FindNeighbors(merged_seurat_filtered_mnn, reduction = &quot;mnn&quot;, dims = 1:20)</code></pre>
+<pre><code>## Computing nearest neighbor graph
+## Computing SNN</code></pre>
+<pre class="r"><code>merged_seurat_filtered_mnn &lt;- FindClusters(merged_seurat_filtered_mnn)
+
+dittoDimPlot(merged_seurat_filtered_mnn, &quot;Patient&quot;, , reduction.use = &quot;UMAP_mnnCorrected&quot;, do.label = TRUE) + ggtitle(&quot;Batch correction using MNN&quot;)</code></pre>
+<p><img src="iscbtutorial_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>p1 &lt;- dittoDimPlot(merged_seurat_filtered, var = &quot;Patient&quot;, 
+                   reduction.use = &quot;UMAP_BatchEffect_Uncorrected&quot;, size = 0.2) + 
+    ggtitle(&quot;Patient ID on UMAP before correction&quot;)
+p2 &lt;- dittoDimPlot(merged_seurat_filtered_mnn, var = &quot;Patient&quot;, 
+                   reduction.use = &quot;UMAP_mnnCorrected&quot;, size = 0.2) + 
+    ggtitle(&quot;Patient ID on UMAP after correction&quot;)
+
+plot_grid(p1, p2)</code></pre>
+<p><img src="iscbtutorial_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+<div id="cell-type-annotations" class="section level2">
+<h2>Cell Type Annotations</h2>
+<p>scRNA-Seq data can be annotated using two techniques: (1) manual
+annotation by domain experts, or (2) automated annotation using
+transcriptomics profiles to assign cell identities. In this tutorial, we
+compare the pros and cons of each of the approaches. Hence, we choose
+automated annotation tools such as scMRMA (Marker Gene Database Based in
+R), SCSA (Marker Gene Database Based in Python) and SingleR (Correlation
+Based in R) and compare the results against the manual annotation tool,
+celltypist.</p>
+<div id="annotation-with-singler" class="section level3">
+<h3>Annotation with SingleR</h3>
+<p>We will now annotate the clusters with SingleR, which is an
+annotation tool combined with Seurat, to explore scRNA-seq data. It is
+available to be downloaded from <a
+href="https://bioconductor.org/packages/release/bioc/html/SingleR.html">Bioconductor</a>.
+SingleR uses a reference dataset of scRNA-seq data with known labels, it
+labels new cells from a test dataset based on similarity to the
+reference. We used the reference database, Blueprint/ENCODE consisting
+of bulk RNA-seq data for pure stroma and immune cells generated by
+Blueprint <a href="https://doi.org/10.3324/haematol.2013.094243">Martens
+and Stunnenberg 2013</a> and ENCODE projects <a
+href="https://doi.org/10.1038/nature11247">The ENCODE Project Consortium
+2012</a>.</p>
+<pre class="r"><code>seurat.singleR &lt;- merged_seurat_filtered_mnn
+
+# load the BlueprintEncodeData
+dataset.ref &lt;- BlueprintEncodeData()
+
+# convert the seurat object to SingleCellExperiment object
+seurat.singleR.sce &lt;- as.SingleCellExperiment(seurat.singleR)
+
+# annotate the dataset with SingleR
+singleR.labels &lt;- SingleR(test = seurat.singleR.sce ,assay.type.test = 1, ref = dataset.ref, labels = dataset.ref$label.main)
+
+# add column in the main dataset with the annotated labels
+seurat.singleR@meta.data$singleR.labels &lt;- singleR.labels$pruned.labels
+
+# change the index of the object to the annotated labels
+seurat.singleR &lt;- SetIdent(seurat.singleR, value = &quot;singleR.labels&quot;)
+
+# find all the markers with the annotations with minimum log2foldchange of 2 and minimum percentage cells as 50%
+all.cluster.markers &lt;- FindAllMarkers(seurat.singleR, logfc.threshold = log2(1.2), min.pct = 0.5)
+
+# export the labelled annotations to csv
+write.csv(all.cluster.markers, &quot;ISCBgastric_singleR_labels_mnn.csv&quot;)</code></pre>
+<pre class="r"><code>UMAP_singleR &lt;- dittoDimPlot(seurat.singleR, reduction.use = &#39;UMAP_mnnCorrected&#39;, var = &#39;singleR.labels&#39;) + ggtitle(&quot;SingleR Annotations&quot;) + theme(legend.text = element_text(size = 10), aspect.ratio = 1)
+
+ggarrange(UMAP_singleR)</code></pre>
+<p><img src="iscbtutorial_files/figure-html/unnamed-chunk-7-1.png" width="672" />
+### Annotation with scMRMA The final annotation tool that we will
+discuss in our tutorial is scMRMA, ‘single cell Multiresolution
+Marker-based Annotation’ algorithm, which is a bidirectional method that
+maps cell clusters against a hierarchical reference by <a
+href="https://academic.oup.com/nar/article/50/2/e7/6396893#327582259">Li
+et. al</a>. scMRMA uses a reference database, PanglaoDB, with lists of
+cell-type markers for various tissue types for both human and mouse,
+which makes it possible to explore cell types with a list of marker
+genes. Furthermore, it also uses another database, TcellAI containing 22
+subcelltypes of T-cells. TcellAI is a part of ImmuCellAI, which was
+originally collected for cancer immune cells <a
+href="https://doi.org/10.1002%2Fadvs.201902880">Miao et. al</a>.
+Therefore, TcellAI is very useful for annotating specific T-cell
+populations in cancer. In addition, scMRMA accepts user-defined
+references as well making it a popular choice to be investigated for
+automated celltype annotation.</p>
+<pre class="r"><code>merged_seurat_scMRMA &lt;- merged_seurat_filtered_mnn
+result &lt;- scMRMA(input = merged_seurat_scMRMA,
+                 species = &quot;Hs&quot;,
+                 db = &quot;panglaodb&quot;,
+                 p = 0.05,
+                 normalizedData = F,
+                 selfDB = NULL,
+                 selfClusters = NULL,
+                 k=20)</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : pseudoinverse used at -2.2945</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : neighborhood radius 0.30103</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : reciprocal condition number 2.4271e-15</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : pseudoinverse used at -2.2945</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : neighborhood radius 0.30103</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
+## : reciprocal condition number 2.4271e-15</code></pre>
+<pre class="r"><code>merged_seurat_scMRMA[[&quot;scMRMA&quot;]] &lt;- result$multiR$annotationResult[colnames(merged_seurat_scMRMA),ncol(result$multiR$annotationResult)]</code></pre>
+<pre class="r"><code>UMAP_scMRMA &lt;- dittoDimPlot(merged_seurat_scMRMA,reduction.use = &quot;UMAP_mnnCorrected&quot;,var = &quot;scMRMA&quot;)+ ggtitle(&quot;scMRMA Annotations&quot;) + theme(legend.text = element_text(size = 10), aspect.ratio = 1)
+ggarrange(UMAP_scMRMA)</code></pre>
+<p><img src="iscbtutorial_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>result &lt;- scMRMA(input = merged_seurat_scMRMA,
+                 species = &quot;Hs&quot;,
+                 db = &quot;TcellAI&quot;,
+                 p = 0.05,
+                 normalizedData = F,
+                 selfDB = NULL,
+                 selfClusters = NULL,
+                 k=20)
+
+
+merged_seurat_scMRMA[[&quot;scMRMA_TcellAI&quot;]] &lt;- result$multiR$annotationResult[colnames(merged_seurat_scMRMA),ncol(result$multiR$annotationResult)]</code></pre>
+<pre class="r"><code>UMAP_scMRMA_tcellAI &lt;- dittoDimPlot(merged_seurat_scMRMA,reduction.use = &quot;UMAP_mnnCorrected&quot;,var = &quot;scMRMA_TcellAI&quot;, do.label = TRUE)+ ggtitle(&quot;scMRMA Annotations with TcellAI&quot;) + theme(legend.text = element_text(size = 10), aspect.ratio = 1)
+ggarrange(UMAP_scMRMA_tcellAI)</code></pre>
+<p><img src="iscbtutorial_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+</div>
+<div id="annotation-with-scsa" class="section level3">
+<h3>Annotation with SCSA</h3>
+<p>SCSA is a python based annotation tool, which annotates the cell
+types from scRNA-seq data, based on a score annotation model combining
+differentially expressed genes (DEGs) and confidence levels of cell
+markers from both known and user-defined information by <a
+href="https://www.frontiersin.org/articles/10.3389/fgene.2020.00490/full">Cao
+et. al</a>. SCSA annotation can be directly applied to clustering
+results obtained from Seurat as well as CellRanger, making it an ideal
+choice for investigation in this study.</p>
+<p>Hence, we will create a .csv file with FindAllMarkers() function and
+give it as an input to SCSA for annotation containing the cluster
+results.</p>
+<pre class="r"><code># prepare data for SCSA annotation in Python
+scsa &lt;- merged_seurat_filtered_mnn
+
+# seurat workflow
+scsa &lt;- ScaleData(object = scsa)</code></pre>
+<pre><code>## Centering and scaling data matrix</code></pre>
+<pre class="r"><code>scsa &lt;- FindNeighbors(scsa, dims = 1:20, reduction = &quot;mnn&quot;)</code></pre>
+<pre><code>## Computing nearest neighbor graph</code></pre>
+<pre><code>## Computing SNN</code></pre>
+<pre class="r"><code>scsa &lt;- FindClusters(scsa)
+scsa &lt;- SetIdent(scsa, value=&quot;seurat_clusters&quot;)
+scsa &lt;- FindAllMarkers(scsa,logfc.threshold = log2(1.2), min.pct = 0.5)</code></pre>
+<pre><code>## Calculating cluster 0</code></pre>
+<pre><code>## Calculating cluster 1</code></pre>
+<pre><code>## Calculating cluster 2</code></pre>
+<pre><code>## Calculating cluster 3</code></pre>
+<pre><code>## Calculating cluster 4</code></pre>
+<pre><code>## Calculating cluster 5</code></pre>
+<pre><code>## Calculating cluster 6</code></pre>
+<pre><code>## Calculating cluster 7</code></pre>
+<pre><code>## Calculating cluster 8</code></pre>
+<pre><code>## Calculating cluster 9</code></pre>
+<pre><code>## Calculating cluster 10</code></pre>
+<pre><code>## Calculating cluster 11</code></pre>
+<pre><code>## Calculating cluster 12</code></pre>
+<pre><code>## Calculating cluster 13</code></pre>
+<pre><code>## Calculating cluster 14</code></pre>
+<pre><code>## Calculating cluster 15</code></pre>
+<pre><code>## Calculating cluster 16</code></pre>
+<pre><code>## Calculating cluster 17</code></pre>
+<pre><code>## Calculating cluster 18</code></pre>
+<pre><code>## Calculating cluster 19</code></pre>
+<pre class="r"><code># write the results to CSV
+write.csv(scsa, &#39;gastric_scsa.csv&#39;)</code></pre>
+<pre class="python"><code>import os
+os.system(&quot;python3 /Users/orphic/Downloads/SCSA-master/SCSA.py -d /Users/orphic/Downloads/SCSA-master/whole.db -s seurat -i /Users/orphic/Downloads/SCSA-master/gastric_scsa.csv -k All -E -g Human -p 0.01 -f 1.5 &gt; results.txt&quot;)</code></pre>
+<p>The results of the annotation from SCSA are saved in your working
+directory in results.txt file.</p>
+</div>
+</div>
+<div id="introducing-nebulosa" class="section level2">
+<h2>Introducing Nebulosa</h2>
+<p><a
+href="https://academic.oup.com/bioinformatics/article/37/16/2485/6103785?login=false">Nebulosa</a>,
+is a R package that uses weighted kernel density estimation to recover
+signals lost through drop-out or low expression for immune cell types.
+The marker genes for immune cell types are referenced from <a
+href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE134520#:~:text=1947.e5.%20PMID%3A-,31067475,-Zhang%20M%2C%20Feng">31067475</a>.</p>
+<p>Individual and joint density plots for T cells with Nebulosa.</p>
+<p>Here, we also show an example of individual and joint density plots
+for T cell with Nebulosa for batch corrected seurat object.</p>
+<pre class="r"><code>tcell &lt;- plot_density(seurat.singleR, c(&quot;CD2&quot;), reduction = &quot;UMAP_mnnCorrected&quot;) + theme(text = element_text(size = 7))  
+tcell + plot_layout(ncol = 1) + theme(text = element_text(size = 7)) </code></pre>
+<p><img src="iscbtutorial_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<pre class="r"><code>tcell &lt;- plot_density(seurat.singleR, c(&quot;CD3D&quot;), reduction = &quot;UMAP_mnnCorrected&quot;) + theme(text = element_text(size = 7))  
+tcell + plot_layout(ncol = 1) + theme(text = element_text(size = 7)) </code></pre>
+<p><img src="iscbtutorial_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<pre class="r"><code>tcell &lt;- plot_density(seurat.singleR, c(&quot;CD3E&quot;), reduction = &quot;UMAP_mnnCorrected&quot;) + theme(text = element_text(size = 7))  
+tcell + plot_layout(ncol = 1) + theme(text = element_text(size = 7)) </code></pre>
+<p><img src="iscbtutorial_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<pre class="r"><code>tcell &lt;- plot_density(seurat.singleR, c(&quot;CD3G&quot;), reduction = &quot;UMAP_mnnCorrected&quot;) + theme(text = element_text(size = 7))  
+tcell + plot_layout(ncol = 1) + theme(text = element_text(size = 7)) </code></pre>
+<p><img src="iscbtutorial_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<pre class="r"><code>tcell &lt;- plot_density(seurat.singleR, c(&quot;CD2&quot;, &quot;CD3D&quot;, &quot;CD3E&quot;, &quot;CD3G&quot;), joint=TRUE, combine=FALSE, reduction = &quot;UMAP_mnnCorrected&quot;)  
+tcell[[length(tcell)]]</code></pre>
+<p><img src="iscbtutorial_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+</div>
+<div id="building-immune-profile" class="section level2">
+<h2>Building Immune Profile</h2>
+<pre class="r"><code>seurat.singleR$sampletemp &lt;- paste(seurat.singleR$type, seurat.singleR$Patient, sep=&quot;&quot;)
+seurat.singleR$sample &lt;- paste(seurat.singleR$singleR.labels, seurat.singleR$sampletemp, sep=&quot;_&quot;)
+
+seurat.singleR$singleR.labels
+singlecell &lt;- as.SingleCellExperiment(seurat.singleR)
+kids &lt;- purrr::set_names(unique(singlecell$singleR.labels))
+kids
+
+# Total number of clusters
+nk &lt;- length(kids)
+nk
+
+# Named vector of sample names
+sids &lt;- purrr::set_names(unique(singlecell$Patient))
+
+# Total number of samples 
+ns &lt;- length(sids)
+ns
+
+table(singlecell$Patient)
+
+n_cells &lt;- as.numeric(table(singlecell$Patient))
+
+## Determine how to reoder the samples (rows) of the metadata to match the order of sample names in sids vector
+m &lt;- match(sids, singlecell$Patient)
+
+## Create the sample level metadata by combining the reordered metadata with the number of cells corresponding to each sample.
+ei &lt;- data.frame(colData(singlecell)[m, ], 
+                  n_cells, row.names = NULL) %&gt;% 
+                select(-&quot;singleR.labels&quot;)
+ei
+
+groups &lt;- colData(singlecell)[, c(&quot;sample&quot;)]
+
+pb &lt;- aggregateAcrossCells(singlecell, groups)
+
+df &lt;- assay(pb)
+
+head(df)</code></pre>
+<p>After bringing in the raw counts data for a particular cell type, we
+use tools from various packages to wrangle our data to the format
+needed, followed by aggregation of the raw counts across the single
+cells to the sample level. The raw counts, a matrix with celltypes in
+rows and genes in columns, were saved in a csv file
+“gastric_patientwise.csv”. The matrix was transposed and a filter was
+applied on UMI count for [500, 5000]. Following plots depict the UMI
+counts for genes in the immune cells for patient4 with NAG. This
+analysis can be useful to bioinformaticians and domain experts for
+extracting crucial insights.</p>
+<p><img src="images/tcells.png" /></p>
+<p><img src="images/bcells.png" /></p>
+<p><img src="images/nkcells.png" /></p>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>The major types of immune cells are lymphocytes (B cells and T
+cells), Natural killer Cells (NK cells), Dendritic Cells, macrophages,
+mast cells, monocytes, neutrophils, eosinophils and basophils. They play
+a crucial role in patient selection in a diverse set of immunotherapies
+such as cytokine therapy, adoptive cell transfer, immune checkpoint
+inhibitors (iCI), Cancer vaccine therapies, oncolytic virus
+therapies.</p>
+<p>We covered only T-cell compositions in this tutorial, and we intent
+to explore in future, other immune cells and their subsets to reveal
+valuable insights to medical practitioners.</p>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>## R version 4.2.2 (2022-10-31)
+## Platform: aarch64-apple-darwin20 (64-bit)
+## Running under: macOS Monterey 12.5.1
+## 
+## Matrix products: default
+## BLAS:   /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/lib/libRblas.0.dylib
+## LAPACK: /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/lib/libRlapack.dylib
+## 
+## locale:
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## attached base packages:
+## [1] stats4    stats     graphics  grDevices utils     datasets  methods  
+## [8] base     
+## 
+## other attached packages:
+##  [1] trqwe_0.1                   scuttle_1.8.4              
+##  [3] SingleCellExperiment_1.20.1 viridis_0.6.2              
+##  [5] viridisLite_0.4.1           cowplot_1.1.1              
+##  [7] harmony_0.1.1               Rcpp_1.0.10                
+##  [9] dittoSeq_1.10.0             Nebulosa_1.8.0             
+## [11] patchwork_1.1.2             SeuratWrappers_0.3.1       
+## [13] scMRMA_1.0                  networkD3_0.4              
+## [15] data.tree_1.0.0             RANN_2.6.1                 
+## [17] plyr_1.8.8                  irlba_2.3.5.1              
+## [19] Matrix_1.5-4                SingleR_2.0.0              
+## [21] ggpubr_0.6.0                celldex_1.8.0              
+## [23] DESeq2_1.38.3               SummarizedExperiment_1.28.0
+## [25] Biobase_2.58.0              MatrixGenerics_1.10.0      
+## [27] matrixStats_0.63.0          GenomicRanges_1.50.2       
+## [29] GenomeInfoDb_1.34.9         IRanges_2.32.0             
+## [31] S4Vectors_0.36.2            BiocGenerics_0.44.0        
+## [33] gridExtra_2.3               scCustomize_1.1.1          
+## [35] lubridate_1.9.2             forcats_1.0.0              
+## [37] stringr_1.5.0               dplyr_1.1.1                
+## [39] purrr_1.0.1                 readr_2.1.4                
+## [41] tidyr_1.3.0                 tibble_3.2.1               
+## [43] ggplot2_3.4.2               tidyverse_2.0.0            
+## [45] SeuratObject_4.1.3          Seurat_4.3.0               
+## 
+## loaded via a namespace (and not attached):
+##   [1] rappdirs_0.3.3                ggprism_1.0.4                
+##   [3] scattermore_0.8               R.methodsS3_1.8.2            
+##   [5] bit64_4.0.5                   knitr_1.42                   
+##   [7] R.utils_2.12.2                DelayedArray_0.24.0          
+##   [9] data.table_1.14.8             KEGGREST_1.38.0              
+##  [11] RCurl_1.98-1.12               generics_0.1.3               
+##  [13] ScaledMatrix_1.6.0            callr_3.7.3                  
+##  [15] usethis_2.1.6                 RSQLite_2.3.1                
+##  [17] future_1.32.0                 bit_4.0.5                    
+##  [19] tzdb_0.3.0                    spatstat.data_3.0-1          
+##  [21] httpuv_1.6.9                  xfun_0.38                    
+##  [23] hms_1.1.3                     jquerylib_0.1.4              
+##  [25] evaluate_0.20                 promises_1.2.0.1             
+##  [27] fansi_1.0.4                   dbplyr_2.3.2                 
+##  [29] igraph_1.4.2                  DBI_1.1.3                    
+##  [31] geneplotter_1.76.0            htmlwidgets_1.6.2            
+##  [33] spatstat.geom_3.1-0           paletteer_1.5.0              
+##  [35] ellipsis_0.3.2                ks_1.14.0                    
+##  [37] backports_1.4.1               annotate_1.76.0              
+##  [39] deldir_1.0-6                  sparseMatrixStats_1.10.0     
+##  [41] vctrs_0.6.1                   here_1.0.1                   
+##  [43] remotes_2.4.2                 ROCR_1.0-11                  
+##  [45] abind_1.4-5                   batchelor_1.14.1             
+##  [47] cachem_1.0.7                  withr_2.5.0                  
+##  [49] progressr_0.13.0              sctransform_0.3.5            
+##  [51] prettyunits_1.1.1             mclust_6.0.0                 
+##  [53] goftest_1.2-3                 cluster_2.1.4                
+##  [55] ExperimentHub_2.6.0           lazyeval_0.2.2               
+##  [57] crayon_1.5.2                  spatstat.explore_3.1-0       
+##  [59] labeling_0.4.2                pkgconfig_2.0.3              
+##  [61] nlme_3.1-162                  vipor_0.4.5                  
+##  [63] pkgload_1.3.2                 devtools_2.4.5.9000          
+##  [65] rlang_1.1.0                   globals_0.16.2               
+##  [67] lifecycle_1.0.3               miniUI_0.1.1.1               
+##  [69] filelock_1.0.2                BiocFileCache_2.6.1          
+##  [71] rsvd_1.0.5                    AnnotationHub_3.6.0          
+##  [73] rprojroot_2.0.3               ggrastr_1.0.1                
+##  [75] polyclip_1.10-4               lmtest_0.9-40                
+##  [77] carData_3.0-5                 zoo_1.8-12                   
+##  [79] beeswarm_0.4.0                pheatmap_1.0.12              
+##  [81] ggridges_0.5.4                GlobalOptions_0.1.2          
+##  [83] processx_3.8.1                png_0.1-8                    
+##  [85] bitops_1.0-7                  R.oo_1.25.0                  
+##  [87] KernSmooth_2.23-20            Biostrings_2.66.0            
+##  [89] blob_1.2.4                    DelayedMatrixStats_1.20.0    
+##  [91] shape_1.4.6                   parallelly_1.35.0            
+##  [93] spatstat.random_3.1-4         rstatix_0.7.2                
+##  [95] ggsignif_0.6.4                beachmat_2.14.2              
+##  [97] scales_1.2.1                  memoise_2.0.1                
+##  [99] magrittr_2.0.3                ica_1.0-3                    
+## [101] zlibbioc_1.44.0               compiler_4.2.2               
+## [103] RColorBrewer_1.1-3            fitdistrplus_1.1-8           
+## [105] snakecase_0.11.0              cli_3.6.1                    
+## [107] urlchecker_1.0.1              XVector_0.38.0               
+## [109] listenv_0.9.0                 pbapply_1.7-0                
+## [111] ps_1.7.5                      MASS_7.3-58.3                
+## [113] tidyselect_1.2.0              stringi_1.7.12               
+## [115] highr_0.10                    yaml_2.3.7                   
+## [117] BiocSingular_1.14.0           locfit_1.5-9.7               
+## [119] ggrepel_0.9.3                 grid_4.2.2                   
+## [121] sass_0.4.5                    tools_4.2.2                  
+## [123] timechange_0.2.0              future.apply_1.10.0          
+## [125] parallel_4.2.2                circlize_0.4.15              
+## [127] rstudioapi_0.14               janitor_2.2.0                
+## [129] farver_2.1.1                  Rtsne_0.16                   
+## [131] digest_0.6.31                 BiocManager_1.30.20          
+## [133] pracma_2.4.2                  shiny_1.7.4                  
+## [135] car_3.1-2                     broom_1.0.4                  
+## [137] BiocVersion_3.16.0            later_1.3.0                  
+## [139] RcppAnnoy_0.0.20              httr_1.4.5                   
+## [141] AnnotationDbi_1.60.2          colorspace_2.1-0             
+## [143] XML_3.99-0.14                 fs_1.6.1                     
+## [145] tensor_1.5                    reticulate_1.28              
+## [147] splines_4.2.2                 uwot_0.1.14                  
+## [149] rematch2_2.1.2                spatstat.utils_3.0-2         
+## [151] sp_1.6-0                      sessioninfo_1.2.2            
+## [153] plotly_4.10.1                 xtable_1.8-4                 
+## [155] jsonlite_1.8.4                R6_2.5.1                     
+## [157] profvis_0.3.7                 pillar_1.9.0                 
+## [159] htmltools_0.5.5               mime_0.12                    
+## [161] glue_1.6.2                    fastmap_1.1.1                
+## [163] BiocParallel_1.32.6           BiocNeighbors_1.16.0         
+## [165] interactiveDisplayBase_1.36.0 codetools_0.2-19             
+## [167] mvtnorm_1.1-3                 pkgbuild_1.4.0               
+## [169] utf8_1.2.3                    ResidualMatrix_1.8.0         
+## [171] lattice_0.21-8                bslib_0.4.2                  
+## [173] spatstat.sparse_3.0-1         curl_5.0.0                   
+## [175] ggbeeswarm_0.7.1              leiden_0.4.3                 
+## [177] limma_3.54.2                  survival_3.5-5               
+## [179] rmarkdown_2.21                munsell_0.5.0                
+## [181] GenomeInfoDbData_1.2.9        reshape2_1.4.4               
+## [183] gtable_0.3.3</code></pre>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
