@@ -1,0 +1,7 @@
+﻿GlobalCell,TypeCell,MarkergenesLit,scMRMA,SingleR,SCSA
+Immune cells,T cell ,"CD2, CD3D,CD3E,CD3G","CD3D, CD3E","CD2, CD3D,CD3E,CD3G","CD2, CD3D,CD3E,CD3G"
+Immune cells,B cell ,"CD79A,CD19",CD79A,CD79A ,CD79A
+Immune cells,mast cells,"TPSAB1,TPSB2",TPSAB1,,
+Immune cells,Macrophage ,"CD14, CD163, CD68, CSF1R ","CD14, CD68","CD14, CD68",
+Stromal cells,Fibroblasts ,"FAP, PDPN,COL1A2,DCN, COL3A1, COL6A1","COL1A2, COL3A1, COL6A1","PDPN,COL1A2,DCN, COL3A1, COL6A1",
+Stromal cells,Endothelial cells ,"PECAM1,VWF,ENG,MCAM ","VWF, ENG","VWF, ENG, MCAM","VWF, ENG"
