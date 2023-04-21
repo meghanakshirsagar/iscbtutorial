@@ -35,6 +35,6 @@ A basic understanding of R syntax would be helpful, but not required.
 
 ### Installation
 
-You can access the tutorial from [github](https://meghanakshirsagar.github.io/icsbtutorial/) 
+You can access the tutorial from [github](https://meghanakshirsagar.github.io/iscbtutorial/) 
 
 Slides are [online](https://docs.google.com/presentation/d/1Q97YKnuTdUQPzQR5cqriJKlrm-7HyiDF-YOVFgC7y3s/edit?usp=sharing)
